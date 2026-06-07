@@ -1,5 +1,5 @@
 //Classe exemplo. Podemos usar no projeto se for conveninente :)
-import { dbClient } from "../config/database";
+import { dbClient } from "@config";
 
 interface UserTable {
     id: number;
