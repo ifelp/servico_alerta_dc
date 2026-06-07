@@ -8,7 +8,7 @@ interface UserTable {
     password_hash: string;
     created_at: string;
 }
-type UserTableWithoutPassword = Omit<UserTable, 'password_hash'>;
+type UserTableWithoutPassword = Omit<UserTable, 'password_hash' | 'created_at'>;
 
 export class UserModel {
 
@@ -28,7 +28,7 @@ export class UserModel {
 
     static async findById(id: number): Promise<UserTableWithoutPassword | null>{
         const user = await dbClient.get<UserTableWithoutPassword>(
-            'SELECT id, name, email, created_at FROM users WHERE id = ?',
+            'SELECT id, name, email FROM users WHERE id = ?',
             [id]
         );
 
@@ -37,7 +37,7 @@ export class UserModel {
 
     static async findByEmail(email: string): Promise<UserTableWithoutPassword | null>{
         const user = await dbClient.get<UserTableWithoutPassword>(
-            'SELECT id, name, email, created_at FROM users WHERE email = ?',
+            'SELECT id, name, email FROM users WHERE email = ?',
             [email]
         );
 
@@ -46,7 +46,7 @@ export class UserModel {
 
     static async findAll():Promise<UserTableWithoutPassword[]>{
         const users = await dbClient.all<UserTableWithoutPassword>(
-            'SELECT id, name, email, created_at FROM users',
+            'SELECT id, name, email FROM users',
         );
 
         return users;
