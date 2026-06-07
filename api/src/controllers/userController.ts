@@ -9,6 +9,10 @@ export class UserController{
             const dto: CreateUserDTO = req.body;
             const { name, email, rawPassword } = dto;
 
+            Object.values(dto).map(val => {
+                if(typeof(val) == undefined) throw new Error("Campo faltante.");
+            });
+
             const user = await UserService.register({
                 name,
                 email,
@@ -21,7 +25,7 @@ export class UserController{
             });
 
         } catch(error: any) {
-            console.error(error);
+            console.error(error.message);
             return res.status(400).json({
                 message: "Erro durante cadastro de usuário.",
                 error: error.message
@@ -36,7 +40,7 @@ export class UserController{
             return res.status(200).json(users);
 
         } catch(error: any) {
-            console.error(error);
+            console.error(error.message);
             return res.status(500).send();
         }
     }
@@ -52,7 +56,7 @@ export class UserController{
             return res.status(200).json(user);
 
         } catch (error: any) {
-            console.error(error)
+            console.error(error.message)
             if(error.message == "Id do usuário inválido.") return res.status(400).json({ error: error.message });
             return res.status(500).send();
         }
