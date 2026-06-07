@@ -26,4 +26,23 @@ export class UserService{
             email: user.email
         };
     }
+
+    static async getAll(): Promise<UserResponseDTO[]>{
+        const users = await UserModel.findAll();
+
+        return users;
+    }
+
+    static async getByEmail(email: string): Promise<UserResponseDTO | null>{
+        const user = await UserModel.findByEmail(email);
+
+        return user;
+    }
+
+    static async getById(id: number): Promise<UserResponseDTO | null>{
+        const user = await UserModel.findById(id);
+
+        return user;
+    }
+
 }
