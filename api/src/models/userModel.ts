@@ -43,4 +43,29 @@ export class UserModel {
 
         return user || null;
     }
+
+    static async findAll():Promise<UserTableWithoutPassword[]>{
+        const users = await dbClient.all<UserTableWithoutPassword>(
+            'SELECT id, name, email, created_at FROM users',
+        );
+
+        return users;
+    }
+
+    static async update(id: number, queryFields: Partial<UserTable>): Promise<boolean>{
+        const keys = Object.keys(queryFields);
+        const values = Object.values(queryFields);
+
+        if(keys.length == 0) return false;
+
+        const query = keys.map(key => `${key} = ?`).join(', ');
+        values.push(id);
+
+        const result = await dbClient.run(
+            `UPDATE users SET ${query} WHERE id = ?`,
+            values
+        )
+
+        return result.changes > 0;
+    }
 }
