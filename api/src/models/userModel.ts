@@ -68,4 +68,13 @@ export class UserModel {
 
         return result.changes > 0;
     }
+
+    static async delete(id:number): Promise<boolean>{
+        const result = await dbClient.run(
+            'DELETE FROM users WHERE id = ?',
+            [id]
+        );
+
+        return result.changes > 0;
+    }
 }
