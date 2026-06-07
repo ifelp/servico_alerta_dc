@@ -24,7 +24,7 @@ export async function runMigrations() {
     }
 
     const migrationFiles = fs.readdirSync(migrationDir).sort();
-    var execs = 0;
+    let execs = 0;
     migrationFiles.map( async (file) => {
         if(!file.endsWith('.sql')) return;
 
