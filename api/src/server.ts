@@ -12,13 +12,6 @@ app.use(cors({
 
 app.use(router);
 
-app.get("/", (req: Request, res: Response) => {
-    res.json({
-        status: 200,
-        message: "Feito com <3 no Cin."
-    });
-})
-
 app.listen(port, ()=>{
     console.log(`App listening on port ${port}`);
 })
