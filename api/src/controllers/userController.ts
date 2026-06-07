@@ -43,7 +43,7 @@ export class UserController{
 
     static async getUserById(req: Request, res: Response){
         try{
-            const { id } = req.query;
+            const { id } = req.params;
             if(Number.isNaN(id)) throw new Error("Id do usuário inválido.");
 
             const user = await UserService.getById(Number(id));
@@ -61,7 +61,7 @@ export class UserController{
     static async updateUser(req: Request, res: Response){
         try{
             const dto: UpdateUserDTO = req.body;
-            const { id } = req.query;
+            const { id } = req.params;
 
             if(Number.isNaN(id)) throw new Error("Id do usuário inválido.");
 
@@ -92,7 +92,7 @@ export class UserController{
 
     static async deleteUser(req: Request, res: Response){
         try{
-            const { id } = req.query;
+            const { id } = req.params;
             
             if(Number.isNaN(id)) throw new Error("Id do usuário inválido.");
 

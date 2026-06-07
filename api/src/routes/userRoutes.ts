@@ -5,8 +5,8 @@ const UserRouter: Router = Router();
 
 UserRouter.get('/', UserController.getAllUsers);
 UserRouter.post('/', UserController.create);
-UserRouter.patch('/?id', UserController.updateUser);
-UserRouter.delete('/?id', UserController.deleteUser);
-UserRouter.get('/id?id', UserController.getUserById);
+UserRouter.patch('/:id', UserController.updateUser);
+UserRouter.delete('/:id', UserController.deleteUser);
+UserRouter.get('/:id', UserController.getUserById);
 
 export default UserRouter;
