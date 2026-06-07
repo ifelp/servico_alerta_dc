@@ -1,0 +1,13 @@
+services:
+  mosquitto-eclipse:
+    image: eclipse-mosquitto:2.0.22
+    container_name: mqtt-broker-container
+    restart: unless-stopped
+    ports:
+      - "1883:1883"
+      - "8883:8883"
+      - "9001:9001"
+    volumes:
+      - ./mosquitto/config:/mosquito/config
+      - ./mosquitto/data:/mosquitto/data
+      - ./mosquitto/log:/mosquito/log
