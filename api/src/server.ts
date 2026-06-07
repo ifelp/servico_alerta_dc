@@ -1,9 +1,15 @@
 import Express, { Request, Response } from "express";
 import cors from "cors";
 import router from "@routes";
+import { runMigrations } from "@config";
 
 const app = Express();
 const port = process.env.PORT || 3001;
+
+async function runmig(){
+    await runMigrations();
+}
+runmig();
 
 app.use(Express.json());
 app.use(cors({
