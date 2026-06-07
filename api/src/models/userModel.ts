@@ -8,9 +8,11 @@ interface UserTable {
     password_hash: string;
     created_at: string;
 }
+type UserTableWithoutPassword = Omit<UserTable, 'password_hash'>;
 
 export class UserModel {
-    static async create(data: Omit<UserTable, 'id' | 'created_at'>): Promise<UserTable> {
+
+    static async create(data: Omit<UserTable, 'id' | 'created_at'>): Promise<Omit<UserTable, 'password_hash'>> {
         const {name, email, password_hash} = data;
         const user = await dbClient.run(
             'INSERT INTO users (name, email, password_hash) VALUES (?, ?, ?)',
@@ -20,8 +22,16 @@ export class UserModel {
             id: user.lastID,
             name,
             email,
-            password_hash,
             created_at: new Date().toISOString()
         }
+    }
+
+    static async findById(id: number): Promise<UserTableWithoutPassword | null>{
+        const user = await dbClient.get<UserTableWithoutPassword>(
+            'SELECT id, name, email, created_at FROM users WHERE id = ?',
+            [id]
+        );
+
+        return user || null;
     }
 }
