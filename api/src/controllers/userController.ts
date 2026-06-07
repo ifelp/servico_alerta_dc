@@ -90,4 +90,27 @@ export class UserController{
         }
     }
 
+    static async deleteUser(req: Request, res: Response){
+        try{
+            const { id } = req.query;
+            
+            if(Number.isNaN(id)) throw new Error("Id do usuário inválido.");
+
+            const remv = await UserService.remove(Number(id));
+
+            if(!remv) throw new Error("Usuário não encontrado.");
+            return res.status(204).send();
+            
+        } catch(error: any){
+            if(error.message == "Id do usuário inválido.") return res.status(400).json({
+                error: error.message
+            })
+            if(error.message == "Usuário não encontrado.") return res.status(404).json({
+                error: error.message
+            })
+
+            return res.status(500).send();
+        }
+    }
+
 }
