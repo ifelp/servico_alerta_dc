@@ -50,10 +50,42 @@ export class UserController{
 
             if(!user) return res.status(204).send();
             return res.status(200).json(user);
-            
+
         } catch (error: any) {
             console.error(error)
             if(error.message == "Id do usuário inválido.") return res.status(400).json({ error: error.message });
+            return res.status(500).send();
+        }
+    }
+
+    static async updateUser(req: Request, res: Response){
+        try{
+            const dto: UpdateUserDTO = req.body;
+            const { id } = req.query;
+
+            if(Number.isNaN(id)) throw new Error("Id do usuário inválido.");
+
+            const updt = await UserService.update(Number(id), dto);
+            
+            if(!updt) throw new Error("Dados vazios ou inalterados.");
+            return res.status(200).json({
+                message: "Usuário atualizado com sucesso."
+            })
+
+        } catch(error: any){
+            if(error.message == "Id do usuário inválido.") return res.status(400).json({
+                error: error.message
+            })
+            if(error.message == "Dados vazios ou inalterados.") return res.status(400).json({
+                error: error.message
+            })
+            if(error.message == "E-mail informado pelo usuário já está em uso.") return res.status(400).json({
+                error: error.message
+            })
+            if(error.message == "O usuário não existe no banco de dados.") return res.status(404).json({
+                error: error.message
+            })
+
             return res.status(500).send();
         }
     }
