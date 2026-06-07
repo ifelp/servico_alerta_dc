@@ -1,37 +1,29 @@
-import sqlite3 from "sqlite3";
+import Database from "better-sqlite3";
 import path from "path";
 
-const sqlite = sqlite3.verbose();
-
 const dbPath = path.resolve(__dirname, '../database/databaseApi.sqlite');
-const db = new sqlite.Database(dbPath);
+const db = new Database(dbPath);
 
 export const dbClient = {
     
-    run(sql: string, params: any[] = []): Promise<{lastID: number; changes: number}> {
-        return new Promise((resolve, reject) => {
-            db.run(sql, params, function(err){
-                if(err) reject(err);
-                resolve({lastID: this.lastID, changes: this.changes});
-            });
-        });
+    async run(sql: string, params: any[] = []): Promise<{lastID: number; changes: number}> {
+        const op = db.prepare(sql);
+        const resp = op.run(...params);
+        return {
+            lastID: resp.lastInsertRowid as number,
+            changes: resp.changes
+        }
     },
 
-    get<T>(sql: string, params: any[] = []): Promise<T | null>{
-        return new Promise((resolve, reject) => {
-            db.get(sql, params, (err,row: T) => {
-                if(err) reject(err);
-                resolve(row || null);
-            });
-        });
+    async get<T>(sql: string, params: any[] = []): Promise<T | null>{
+        const op = db.prepare(sql);
+        const resp = op.get(...params);
+        return (resp as T) || null;
     },
 
-    all<T>(sql: string, params: any[] = []): Promise<T[]>{
-        return new Promise((resolve, reject) => {
-            db.all(sql, params, (err, rows: T[]) =>{
-                if(err) reject(err);
-                resolve(rows || []);
-            })
-        })
+    async all<T>(sql: string, params: any[] = []): Promise<T[]>{
+        const op = db.prepare(sql);
+        const resp = op.all(...params);
+        return (resp as T[]) || null;
     }
 }
