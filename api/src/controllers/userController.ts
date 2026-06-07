@@ -9,7 +9,7 @@ export class UserController{
             const dto: CreateUserDTO = req.body;
             const { name, email, rawPassword } = dto;
 
-            const user = UserService.register({
+            const user = await UserService.register({
                 name,
                 email,
                 rawPassword
@@ -29,7 +29,7 @@ export class UserController{
         }
     }
 
-    static async getAllUsers(res: Response){
+    static async getAllUsers(req: Request, res: Response){
         try{
             const users = await UserService.getAll();
 
