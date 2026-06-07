@@ -34,4 +34,13 @@ export class UserModel {
 
         return user || null;
     }
+
+    static async findByEmail(email: string): Promise<UserTableWithoutPassword | null>{
+        const user = await dbClient.get<UserTableWithoutPassword>(
+            'SELECT id, name, email, created_at FROM users WHERE email = ?',
+            [email]
+        );
+
+        return user || null;
+    }
 }
