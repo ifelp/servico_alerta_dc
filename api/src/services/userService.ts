@@ -69,4 +69,9 @@ export class UserService{
         return result;
     }
 
+    static async remove(id: number): Promise<boolean> {
+        const result = await UserModel.delete(id);
+
+        return result;
+    }
 }
