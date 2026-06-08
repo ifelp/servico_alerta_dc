@@ -9,9 +9,9 @@ export class UserController{
             const dto: CreateUserDTO = req.body;
             const { name, email, rawPassword } = dto;
 
-            Object.values(dto).map(val => {
-                if(typeof(val) == undefined) throw new Error("Campo faltante.");
-            });
+            if(Object.values(dto).length < 3){
+                throw new Error("Há um campo em falta na requisição.");
+            }
 
             const user = await UserService.register({
                 name,
