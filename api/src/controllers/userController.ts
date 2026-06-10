@@ -89,6 +89,7 @@ export class UserController{
             if(error.message == "O usuário não existe no banco de dados.") return res.status(404).json({
                 error: error.message
             })
+            console.error(error.message);
 
             return res.status(500).send();
         }
@@ -112,7 +113,7 @@ export class UserController{
             if(error.message == "Usuário não encontrado.") return res.status(404).json({
                 error: error.message
             })
-
+            console.error(error.message);
             return res.status(500).send();
         }
     }
