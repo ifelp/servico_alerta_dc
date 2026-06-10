@@ -215,3 +215,6 @@ yarn-error.log
 # testing
 /coverage
 
+#mqtt files
+mosquitto/data/*
+mosquitto/log/*
