@@ -20,16 +20,16 @@ O que este componente precisa fazer no nosso sistema distribuído?
 ---
 
 ## 🛠️ Checklist de Implementação (Sub-issues)
-*Divida o peso para ninguém carregar o grupo nas costas. Crie as sub-issues e linke o `#Número` delas aqui.*
+Crie as sub-issues e linke o `#Número` delas aqui.*
 
-- [ ] #SubIssue_Aqui - Criar a estrutura de dados/mensagens (Protobuf ou JSON)
-- [ ] #SubIssue_Aqui - Implementar a lógica do servidor/receptor
-- [ ] #SubIssue_Aqui - Implementar a lógica do cliente/emissor
-- [ ] Tratar concorrência (Mutex/Semáforos) para evitar Race Condition
+- [ ] #SubIssue_Aqui - Sub-issue 1
+- [ ] #SubIssue_Aqui - Sub-issue 2
+- [ ] #SubIssue_Aqui - Sub-issue 3
+- [ ] To-do --
 
 ---
 
-## 🧪 Como testar essa budega?
+## 🧪 Como testar isso?
 Para garantir que o módulo funciona antes de juntar tudo no repositório principal:
 1. Rodar o comando: `instrução de build/run`
 2. Simular o cenário: *(Ex: Matar o processo do nó principal e ver se o secundário assume).*
