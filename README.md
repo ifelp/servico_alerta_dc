@@ -18,3 +18,5 @@ Repositório do segundo projeto de Redes e Sistemas Distribuídos.
 ### • **TypeScript** - Linguagem de Programação
 
 ### • **Eclipse Mosquitto** - Broker de mensagens
+
+### • **Docker** - Conteinerização de aplicação
