@@ -10,6 +10,9 @@ Repositório do segundo projeto de Redes e Sistemas Distribuídos.
     <a href="https://mosquitto.org/">
         <img src="https://mosquitto.org/images/mosquitto-text-side-28.png" alt="Eclipse Mosquitto™ An open source MQTT broker" width="20%" />
     </a>
+    <a href="https://www.docker.com/">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/1/1e/Docker_Logo.png" alt="Docker: Accelerated Container Application Development" width="20%">
+    </a>
 </p>
 
 ### • **TypeScript** - Linguagem de Programação
