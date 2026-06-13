@@ -1,32 +1,29 @@
+version: "3.8"
+
 services:
   mosquitto-eclipse:
     image: eclipse-mosquitto:2.0.22
     container_name: mqtt-broker-container
     restart: unless-stopped
     ports:
-    - "1883:1883"
-    - "8883:8883"
-    - "9001:9001"
+      - "1883:1883"
+      - "9001:9001"
     volumes:
-    - ./mosquitto/config:/mosquito/config
-    - ./mosquitto/data:/mosquitto/data
-    - ./mosquitto/log:/mosquito/log
+      - ./mosquitto/config:/mosquitto/config
+      - ./mosquitto/data:/mosquitto/data
+      - ./mosquitto/log:/mosquitto/log
+
   api-server:
     build:
-        context: ./api
-        dockerfile: Dockerfile
+      context: ./api
+      dockerfile: Dockerfile
     container_name: dc_server
+    depends_on:
+      - mosquitto-eclipse
     ports:
-        - "3001:3001"
-    develop:
-      watch:
-        - path: ./api
-          action: sync
-          target: /home/node/app
-          ignore:
-            - node_modules/
-        - path: ./api/package.json
-          action: rebuild
+      - "3001:3001"
     volumes:
-      - ${PWD}/api/src/database/:/home/node/app/src/database/
-          
+      - ./api/src/database:/home/node/app/src/database
+    environment:
+      - NODE_ENV=development
+      - MQTT_URL=mqtt://mosquitto-eclipse:1883
