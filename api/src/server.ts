@@ -1,23 +1,31 @@
-import Express, { Request, Response } from "express";
+import Express from "express";
 import cors from "cors";
 import router from "@routes";
 import { runMigrations } from "@config";
+import { connectMqttBroker } from "@mqtt/client";
 
 const app = Express();
-const port = process.env.PORT || 3001;
+const port = Number(process.env.PORT ?? 3001);
 
-async function runmig(){
-    await runMigrations();
-}
-runmig();
+async function bootstrap() {
+  await runMigrations();
+  await connectMqttBroker();
 
-app.use(Express.json());
-app.use(cors({
-    origin: ["*"] //enquanto ainda não temos os serviços bem definidos.
-}))
+  app.use(Express.json());
+  app.use(
+    cors({
+      origin: ["*"]
+    })
+  );
 
-app.use(router);
+  app.use(router);
 
-app.listen(port, ()=>{
+  app.listen(port, () => {
     console.log(`App escutando na porta ${port}`);
-})
+  });
+}
+
+bootstrap().catch((error) => {
+  console.error("Falha ao iniciar a aplicação:", error);
+  process.exit(1);
+});
