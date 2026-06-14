@@ -4,13 +4,14 @@ services:
     container_name: mqtt-broker-container
     restart: unless-stopped
     ports:
-    - "1883:1883"
-    - "8883:8883"
-    - "9001:9001"
+      - "1883:1883"
+      - "9001:9001"
     volumes:
-    - ./mosquitto/config:/mosquito/config
-    - ./mosquitto/data:/mosquitto/data
-    - ./mosquitto/log:/mosquito/log
+      - ./mosquitto/config:/mosquitto/config
+      - ./mosquitto/data:/mosquitto/data
+      - ./mosquitto/log:/mosquitto/log
+    networks:
+      - dfc_api
   api-server:
     build:
         context: ./api
@@ -27,6 +28,13 @@ services:
             - node_modules/
         - path: ./api/package.json
           action: rebuild
+    depends_on:
+      - mosquitto-eclipse
     volumes:
-      - ${PWD}/api/src/database/:/home/node/app/src/database/
+      - ${PWD}/api/src/database:/home/node/app/src/database
+    networks:
+      - dfc_api
+
+networks:
+  dfc_api:
           
