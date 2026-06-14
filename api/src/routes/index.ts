@@ -1,5 +1,6 @@
 import { Router } from "express";
 import UserRouter from "./userRoutes";
+import AlertRouter from "./alertRoutes";
 
 const router: Router = Router();
 
@@ -11,5 +12,6 @@ router.get('/', (_, res) => {
 
 //Rotas para User
 router.use('/user', UserRouter);
+router.use('/alert', AlertRouter);
 
 export default router;
