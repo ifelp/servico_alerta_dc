@@ -223,28 +223,20 @@ docker-compose up --build
 
 Isso inicializa:
 - **Eclipse Mosquitto** (broker MQTT) na porta `1883`
-- **API Gateway** (Express) na porta `3000`
+- **API Gateway** (Express) na porta `3001`
 
 ### 3. Verificar o Health-Check da API
 
 ```bash
-curl http://localhost:3000/health
+curl http://localhost:3001/
 ```
 
 Resposta esperada:
 ```json
-{ "status": "ok" }
+{"message":"Feito com <3 e :D no Cin!"}
 ```
 
-### 4. Rodar a API Localmente (sem Docker)
-
-```bash
-cd api
-npm install
-npm run dev
-```
-
-### 5. Testar o Broker MQTT Manualmente
+### 4. Testar o Broker MQTT Manualmente
 
 Com os serviços rodando, abra dois terminais:
 
