@@ -17,6 +17,7 @@ export default function Home() {
 
   return (
     <PageWrapper title='Alerta Cidadão' showHeader={true}>
+      <div className='pb-4'>
         <ZoneHero 
         bg={cfg.bg} 
         ring={cfg.ring} 
@@ -46,6 +47,7 @@ export default function Home() {
             />
           ))}
         </AlertsSecion>
+      </div>
     </PageWrapper>
   )
 }
