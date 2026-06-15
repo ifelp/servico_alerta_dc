@@ -4,11 +4,12 @@ import AlertsHistory from "../../components/alertsHistory"
 import AlertsCard from "../../components/ui/alertCard"
 import EmptyAlertsHistory from "../../components/ui/emptyAlertsHistory"
 import { ZONES, MOCK_ALERTS } from "../../utils/mocks"
+import { useZone } from "../../contexts/zoneContext"
 
 export default function History(){
-    const zoneId = "zona_A"
-    const zone = ZONES.find((z) => z.id === zoneId) ?? ZONES[0]
-    const alerts = MOCK_ALERTS.filter((a) => a.zone === zoneId).sort(
+    const { currentZone } = useZone();
+    const zone = ZONES.find((z) => z.id === currentZone) ?? ZONES[0]
+    const alerts = MOCK_ALERTS.filter((a) => a.zone === currentZone).sort(
         (a,b) => +new Date(b.issuedAt) - +new Date(a.issuedAt)
     );
 

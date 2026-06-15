@@ -6,11 +6,12 @@ import AlertsSecion from '../../components/alertsSection'
 import { MOCK_ALERTS, ZONES } from '../../utils/mocks'
 import { STATUS_BY_SEV } from '../../utils/subdescription'
 import HomeAlertCard from '../../components/ui/HomeAlertCard'
+import { useZone } from '../../contexts/zoneContext'
 
 export default function Home() {
-  const zoneId = "zona_A"
-  const zone = ZONES.find((z) => z.id === zoneId) ?? ZONES[0]
-  const zoneAlerts = MOCK_ALERTS.filter((a) => a.zone === zoneId)
+  const { currentZone } = useZone()
+  const zone = ZONES.find((z) => z.id === currentZone) ?? ZONES[0]
+  const zoneAlerts = MOCK_ALERTS.filter((a) => a.zone === currentZone)
   const latest = zoneAlerts[0]
   const status = latest ? latest.severity : "OK"
   const cfg = STATUS_BY_SEV[status];
@@ -19,7 +20,7 @@ export default function Home() {
     <PageWrapper title='Alerta Cidadão' showHeader={true}>
       <div className='pb-4'>
         <ZoneHero 
-        bg={cfg.bg} 
+        bg={cfg.bg}
         ring={cfg.ring} 
         icon={cfg.icon} 
         label={cfg.label} 

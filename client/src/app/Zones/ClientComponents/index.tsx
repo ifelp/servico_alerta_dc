@@ -5,16 +5,17 @@ import ZoneButtonFooter from "../../../components/zoneButtonFooter";
 import { ZONES } from "../../../utils/mocks";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useZone } from "../../../contexts/zoneContext";
 
 export default function Zones(){
-    const zoneId = "zona_A"
-    const [selected, setSelected] = useState(zoneId);
+    const { currentZone, changeZone } = useZone()
+    const [selected, setSelected] = useState(currentZone || "zona_A");
     const [confirming, setConfirming] = useState(false);
     const navigate = useNavigate();
 
     const handleConfirm = () => {
         setConfirming(true);
-        // setZone(selected); Construir um contexto global para guardar estado da zona.
+        changeZone(selected)
         setTimeout(() => navigate("/"), 700);
   };
 
