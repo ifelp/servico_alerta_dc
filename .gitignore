@@ -218,3 +218,14 @@ yarn-error.log
 #mqtt files
 mosquitto/data/*
 mosquitto/log/*
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
