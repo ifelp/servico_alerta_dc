@@ -85,6 +85,11 @@ servico_alerta_dc/
 │   ├── package.json
 │   ├── package-lock.json
 │   └── tsconfig.json
+├── client/                   # Aplicativo do Cidadão (React + Vite + Capacitor)
+│   ├── android/              # Projeto Android gerado pelo Capacitor
+│   ├── public/               # Arquivos estáticos públicos
+│   └── src/
+│       └── assets/           # Imagens, ícones e recursos estáticos da interface
 ├── mosquitto/
 │   └── config/
 │       └── mosquitto.conf    # Configuração do broker Eclipse Mosquitto
