@@ -19,7 +19,7 @@ export default function Zones(){
   };
 
     return (
-        <div className="px-5 pt-6">
+        <div className="px-5 pt-6 pb-4">
             <ZonePageInfo/>
             <SelectZoneSection zones={ZONES} selectedZone={selected} setSelectedZone={setSelected}/>
             <ZoneButtonFooter handleConfirm={handleConfirm} confirming={confirming} />
