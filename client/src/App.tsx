@@ -1,14 +1,15 @@
-import './App.css'
+import { createBrowserRouter, RouterProvider } from 'react-router-dom'
+import Home from './app/Home'
 
-function App() {
+const router = createBrowserRouter([
+  {
+    path: '/',
+    element: <Home/>
+  }
+])
 
-  return (
-    <>
-      <div className='flex flex-row self-center text-amber-300'>
-          <p>Serviço de alerta da defesa civil</p>
-      </div>
-    </>
-  )
+function App(){
+  return <RouterProvider router={router}/>
 }
 
 export default App
