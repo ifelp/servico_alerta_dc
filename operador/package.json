@@ -1,0 +1,32 @@
+{
+  "name": "operador",
+  "version": "1.0.0",
+  "description": "Cliente Operador para envio de mensagens dinâmicas ao servidor",
+  "main": "dist/index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "npx tsx watch src/index.ts --no-warnings",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "example": "npx tsx src/examples/basicExample.ts",
+    "example:advanced": "npx tsx src/examples/advancedExample.ts"
+  },
+  "keywords": [
+    "operador",
+    "mqtt",
+    "http",
+    "client"
+  ],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.33.0",
+  "dependencies": {
+    "axios": "^1.7.2",
+    "dotenv": "^17.4.2"
+  },
+  "devDependencies": {
+    "@types/node": "^25.9.2",
+    "typescript": "^5.6.3",
+    "tsx": "^4.19.1"
+  }
+}
