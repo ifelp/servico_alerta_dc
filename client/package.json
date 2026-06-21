@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite --host",
+    "client": "npx tsx src/requests/receiveAlerts.ts",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview"
@@ -15,6 +16,7 @@
     "@capacitor/core": "^8.4.0",
     "@tailwindcss/vite": "^4.3.1",
     "lucide-react": "^1.18.0",
+    "mqtt": "^5.15.1",
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
     "react-router-dom": "^7.17.0",
