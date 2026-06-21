@@ -15,6 +15,8 @@
     "@capacitor/cli": "^8.4.0",
     "@capacitor/core": "^8.4.0",
     "@tailwindcss/vite": "^4.3.1",
+    "@tanstack/react-query": "^5.101.0",
+    "axios": "^1.18.0",
     "lucide-react": "^1.18.0",
     "mqtt": "^5.15.1",
     "react": "^19.2.6",
