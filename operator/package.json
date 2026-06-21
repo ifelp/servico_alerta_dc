@@ -8,7 +8,8 @@
   "main": "index.js",
   "scripts": {
     "dev": "npx tsx --watch src/index.ts",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "operator": "npx tsx cli/index.ts"
   },
   "dependencies": {
     "@clack/prompts": "^1.5.1",
