@@ -2,11 +2,11 @@
 
 
 
-## 📋 Descrição do Projeto
+## Descrição
 
 Sistema distribuído de distribuição de alertas emergenciais baseados em localização geográfica. A plataforma permite que operadores disparem alertas categorizados por zona e tipo de risco, os quais são entregues em tempo real via modelo **Push**  a todos os cidadãos inscritos naquela região.
 
-O sistema é composto por três componentes principais:
+O sistema é composto por quatro componentes principais:
 
 - **API Gateway (Node.js + Express + TypeScript):** recebe os alertas do operador, valida os dados e publica no broker MQTT.
 - **Broker de Mensagens (Eclipse Mosquitto via Docker):** responsável pelo roteamento e entrega dos alertas aos clientes inscritos.
@@ -63,7 +63,7 @@ Escolha fundamentada em critérios de resiliência crítica:
 
 ---
 
-## 🗂️ Estrutura de Pastas
+## Estrutura do repositório
 
 ```
 servico_alerta_dc/
@@ -100,7 +100,7 @@ servico_alerta_dc/
 
 ---
 
-## 🌐 Topologia da Árvore de Tópicos MQTT
+## Topologia da Árvore de Tópicos MQTT
 
 O roteamento dos alertas segue uma hierarquia lógica geográfica/categórica:
 
@@ -142,14 +142,14 @@ interface Alert {
 
 ---
 
-## 📡 Protocolo de Comunicação
+## Protocolo de Comunicação
 
 ### Fluxo Geral
 
 ```
 [Operador TUI]
       |
-      | POST /enviar-alerta (JSON)
+      | POST /alert (JSON)
       ▼
 [API Gateway — Express]
       | Valida payload (regras de negócio)
@@ -165,11 +165,10 @@ interface Alert {
 O Painel do Operador **nunca publica diretamente no broker.** Toda mensagem passa obrigatoriamente pela API, que atua como validador e guardião do domínio.
 
 ### Endpoints da API
-> ⚠️ **Mapeamento provisório:** os endpoints abaixo representam o contrato inicial definido nesta entrega. A tabela final será consolidada e expandida nas próximas entregas.
 
 | Método | Rota | Descrição |
 |---|---|---|
-| `POST` | `/enviar-alerta` | Valida e publica um novo alerta |
+| `POST` | `/alert` | Valida e publica um novo alerta |
 | `GET` | `/historico` | Retorna alertas persistidos no SQLite |
 | `GET` | `/health` | Health-check do servidor |
 
@@ -201,12 +200,12 @@ Qualquer violação retorna HTTP `400 Bad Request`, impedindo que dados malforma
 
 ---
 
-## 🚀 Como Rodar a Aplicação
+## Como Rodar a Aplicação
 
 ### Pré-requisitos
 
 - [Docker](https://www.docker.com/) e [Docker Compose](https://docs.docker.com/compose/) instalados
-- [Node.js](https://nodejs.org/) >= 18 (para desenvolvimento local sem Docker)
+- [Node.js](https://nodejs.org/) >= 18 e npm
 
 ### 1. Clonar o Repositório
 
@@ -215,59 +214,92 @@ git clone https://github.com/ifelp/servico_alerta_dc.git
 cd servico_alerta_dc
 ```
 
-### 2. Subir os Serviços com Docker Compose
+### 2. Subir a API e o Broker (raiz do projeto)
+
+Na **raiz** do repositório, suba o broker MQTT (Mosquitto) e a API com Docker Compose:
 
 ```bash
-docker-compose up --build
+docker compose up --build
 ```
 
 Isso inicializa:
-- **Eclipse Mosquitto** (broker MQTT) na porta `1883`
+- **Eclipse Mosquitto** (broker MQTT) nas portas `1883` e `9001`
 - **API Gateway** (Express) na porta `3001`
 
-### 3. Verificar o Health-Check da API
+Mantenha este terminal aberto — é nele que aparecem os logs da API e do broker.
+
+> Verificação opcional: `curl http://localhost:3001/` deve responder `{"message":"Feito com <3 e :D no Cin!"}`.
+
+### 3. Conectar clientes (cidadãos) em zonas distintas
+
+Em outro terminal, entre na pasta `client` e instale as dependências (apenas na primeira vez):
 
 ```bash
-curl http://localhost:3001/
+cd client
+npm install
 ```
 
-Resposta esperada:
-```json
-{"message":"Feito com <3 e :D no Cin!"}
-```
+Em seguida, conecte um cliente a uma zona específica:
 
-### 4. Testar o Broker MQTT Manualmente
-
-Com os serviços rodando, abra dois terminais:
-
-**Terminal 1 — Subscriber (cidadão inscrito na zona_A):**
 ```bash
-docker exec -it mqtt-broker-container mosquitto_sub -h localhost -p 1883 -t "defesacivil/alertas/zona_A/#" -v
+npm run client -- <zona>
 ```
 
-**Terminal 2 — Publisher (dispara um alerta via rota HTTP da API):**
+Exemplo:
+
 ```bash
-curl -X POST http://localhost:3001/alert \
-  -H "Content-Type: application/json" \
-  -d '{
-    "id": 1,
-    "zona": "zona_A",
-    "categoria": "chuva",
-    "gravidade": "ALTO",
-    "descricao": "Risco iminente de alagamento e deslizamento na encosta norte.",
-    "timestamp": "2026-06-14T20:15:00Z"
-  }'
+npm run client -- zona_a
 ```
 
-O alerta publicado via `POST /alert` deve aparecer imediatamente no Terminal 1, confirmando o fluxo completo API → Mosquitto → Subscriber.
+O cliente se conecta ao broker e assina o tópico `defesacivil/alertas/<zona>/#`, ficando à espera de alertas para aquela zona.
 
-**Evidência — Publisher (POST /alert):**
+**Podemos abrir quantos clientes quiser, em terminais diferentes, cada um observando uma zona distinta**, por exemplo:
 
-![Teste Publisher](https://github.com/user-attachments/assets/19fc2f3a-7dd0-438b-ae71-07e7dfc94622)
+```bash
+npm run client -- zona_a   # terminal A
+npm run client -- zona_b   # terminal B
+npm run client -- zona_c   # terminal C
+```
 
-**Evidência — Subscriber (recebimento via MQTT):**
+### 4. Disparar um alerta pelo Painel do Operador
 
-![Teste Subscriber](https://github.com/user-attachments/assets/1f9db292-ceb1-49d7-ba04-e246f220b827)
+Em outro terminal, entre na pasta `operator` e instale as dependências (apenas na primeira vez):
+
+```bash
+cd operator
+npm install
+```
+
+Em seguida, inicie o painel do operador:
+
+```bash
+npm run operator
+```
+
+O terminal apresentará um formulário interativo solicitando:
+
+- 📍 **Zona** (ex: `zona_a`)
+- 🏷️ **Categoria** (ex: `chuva`, `deslizamento`, `alagamento`, `incendio`, `vendaval`, `rompimento_barragem`)
+- ⚠️ **Gravidade** (`BAIXO`, `MEDIO` ou `ALTO`)
+- 📝 **Descrição** do alerta
+
+Ao confirmar, o operador envia o alerta via `POST /alert` para a API, que valida o payload e publica no broker MQTT.
+
+### 5. Validar o recebimento das mensagens
+
+Após o envio pelo operador, o alerta deve aparecer **imediatamente** no terminal de cada cliente conectado à zona correspondente, exibindo zona, categoria, gravidade, descrição e timestamp. Clientes conectados a outras zonas não devem receber a mensagem — isso confirma o roteamento correto por zona via MQTT.
+
+**Resumo do fluxo de teste:**
+
+```
+Terminal 1 (raiz)      → docker compose up --build      (API + Broker)
+Terminal 2 (client)    → npm run client -- zona_a        (cidadão na zona_a)
+Terminal 3 (client)    → npm run client -- zona_b        (cidadão na zona_b)
+Terminal 4 (operator)  → npm run operator                (dispara alerta para zona_a)
+```
+
+O alerta disparado no Terminal 4 deve chegar apenas ao Terminal 2 (zona_a), confirmando o fluxo completo Operador → API → Mosquitto → Cliente.
+
 ---
 
 ## 👥 Equipe 04
@@ -277,9 +309,5 @@ O alerta publicado via `POST /alert` deve aparecer imediatamente no Terminal 1, 
 | Gabriel Fonseca |
 | Guilherme Barbosa |
 | Iranildo Felipe |
-| Rodrigo Neves |
+| Rodrigo de Andrade |
 | Thiago Bernardo |
-
-
-
-
