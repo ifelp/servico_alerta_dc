@@ -7,9 +7,11 @@ import { MOCK_ALERTS, ZONES } from '../../utils/mocks'
 import { STATUS_BY_SEV } from '../../utils/subdescription'
 import HomeAlertCard from '../../components/ui/HomeAlertCard'
 import { useZone } from '../../contexts/zoneContext'
+import { useMqtt } from '../../hooks/useMqtt'
 
 export default function Home() {
   const { currentZone } = useZone()
+  const { status: mqttStatus } = useMqtt()
   const zone = ZONES.find((z) => z.id === currentZone) ?? ZONES[0]
   const zoneAlerts = MOCK_ALERTS.filter((a) => a.zone === currentZone)
   const latest = zoneAlerts[0]
@@ -26,6 +28,7 @@ export default function Home() {
         label={cfg.label} 
         zoneLabel={zone.label} 
         sub={cfg.sub} 
+        mqttStatus={mqttStatus} 
         />
         {latest && (
           <LatestAlertsSection>
