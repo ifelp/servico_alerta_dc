@@ -2,6 +2,9 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import Home from './app/Home'
 import ZonePage from './app/Zones'
 import History from './app/History'
+import { AlertProvider } from './contexts/alertContext'
+import AlertPopup from './components/AlertPopup'
+import { useZone } from './contexts/zoneContext'
 
 const router = createBrowserRouter([
   {
@@ -18,8 +21,18 @@ const router = createBrowserRouter([
   }
 ])
 
-function App(){
-  return <RouterProvider router={router}/>
+function AppInner() {
+  const { currentZone } = useZone()
+  return (
+    <AlertProvider zone={currentZone}>
+      <AlertPopup />
+      <RouterProvider router={router} />
+    </AlertProvider>
+  )
+}
+
+function App() {
+  return <AppInner />
 }
 
 export default App
