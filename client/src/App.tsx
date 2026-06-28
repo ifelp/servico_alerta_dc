@@ -3,7 +3,7 @@ import Home from './app/Home'
 import ZonePage from './app/Zones'
 import History from './app/History'
 import { AlertProvider } from './contexts/alertContext'
-import AlertPopup from './components/AlertPopup'
+import AlertPopup from './components/alertPopup'
 import { useZone } from './contexts/zoneContext'
 
 const router = createBrowserRouter([
