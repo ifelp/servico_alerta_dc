@@ -1,10 +1,11 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { getMqttClient } from '../services/mqttClient'
 
 export type MqttStatus = 'conectando' | 'conectado' | 'desconectado'
 
 export function useMqtt() {
   const [status, setStatus] = useState<MqttStatus>('conectando')
+  const zonaAtualRef = useRef<string | null>(null) 
 
   useEffect(() => {
     const client = getMqttClient()
@@ -17,7 +18,6 @@ export function useMqtt() {
     client.on('error', onError)
     client.on('close', onClose)
 
-    // Se já estava conectado antes de montar o componente
     if (client.connected) setStatus('conectado')
 
     return () => {
@@ -27,12 +27,21 @@ export function useMqtt() {
     }
   }, [])
 
-  function inscreverZona(zona: string) {
+  function inscreverZona(novaZona: string) {
     const client = getMqttClient()
-    // Tópico: defesacivil/alertas/zona_A/#
-    client.subscribe(`defesacivil/alertas/${zona}/#`, (err) => {
+
+    
+    if (zonaAtualRef.current && zonaAtualRef.current !== novaZona) {
+      client.unsubscribe(`defesacivil/alertas/${zonaAtualRef.current}/#`)
+    }
+
+    
+    client.subscribe(`defesacivil/alertas/${novaZona}/#`, (err: Error | null) => {
       if (err) console.error('Erro ao inscrever na zona:', err)
     })
+
+    
+    zonaAtualRef.current = novaZona
   }
 
   return { status, inscreverZona }

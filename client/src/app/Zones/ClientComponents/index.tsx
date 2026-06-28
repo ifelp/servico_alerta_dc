@@ -17,6 +17,7 @@ export default function Zones(){
 
     const handleConfirm = () => {
         if (status !== 'conectado') return
+        
 
         setConfirming(true);
         inscreverZona(selected)
