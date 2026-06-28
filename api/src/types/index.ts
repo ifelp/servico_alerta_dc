@@ -1,9 +1,10 @@
 import { CreateUserDTO, UserResponseDTO, UpdateUserDTO } from "./userTypes";
-import { AlertPayload } from "./alertTypes";
+import { AlertPayload, AlertEntity } from "./alertTypes";
 
 export {
     CreateUserDTO,
     UserResponseDTO,
     UpdateUserDTO,
-    AlertPayload
+    AlertPayload,
+    AlertEntity
 }
