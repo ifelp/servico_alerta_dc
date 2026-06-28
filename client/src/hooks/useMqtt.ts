@@ -1,15 +1,15 @@
 import { useEffect, useState } from 'react'
 import { useZone } from '../contexts/zoneContext'
-import { getMqttClient } from '../services/mqttClient'
+import client from '../services/mqttClient'
 
 export type MqttStatus = 'conectando' | 'conectado' | 'desconectado'
+
 
 export function useMqtt() {
   const [status, setStatus] = useState<MqttStatus>('conectando')
   const { currentZone, changeZone } = useZone();
 
   useEffect(() => {
-    const client = getMqttClient()
 
     const onConnect = () => setStatus('conectado')
     const onError = () => setStatus('desconectado')
@@ -21,15 +21,9 @@ export function useMqtt() {
 
     if (client.connected) setStatus('conectado')
 
-    return () => {
-      client.off('connect', onConnect)
-      client.off('error', onError)
-      client.off('close', onClose)
-    }
   }, [])
 
   function inscreverZona(novaZona: string) {
-    const client = getMqttClient()
 
     console.log(currentZone);
 
