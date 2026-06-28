@@ -18,7 +18,7 @@ export default function History(){
             <HistoryHeader alertsLeng={alerts.length} zoneLabel={zone.label} />
             <AlertsHistory>
                 {alerts.map((a) => (
-                    <AlertsCard title={a.title} description={a.description} issuedAt={a.issuedAt} severity={a.severity} />
+                    <AlertsCard key={a.id} title={a.title} description={a.description} issuedAt={a.issuedAt} severity={a.severity} />
                 ))}
                 {alerts.length === 0 && (
                     <EmptyAlertsHistory/>
