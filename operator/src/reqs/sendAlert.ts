@@ -1,5 +1,5 @@
 import axios, { AxiosError, AxiosResponse } from "axios";
-import { AlertPayload } from "../../types/Alert";
+import { AlertPayload } from "../types/Alert";
 
 const SERVER_URL = process.env.SERVER_URL || "http://localhost:3001/alert"
 const KEY = process.env.SENHA_DO_PROJETO_MANHATTAN || '';

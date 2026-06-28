@@ -1,4 +1,4 @@
-import { AlertPayload } from "../../types/Alert";
+import { AlertPayload } from "../types/Alert";
 
 export default function formatMessage(kidnapLog: (log: string) => void, receivedTopic: string, payload: AlertPayload){
 
