@@ -9,7 +9,7 @@ import { useZone } from "../../../contexts/zoneContext";
 import { useMqtt } from "../../../hooks/useMqtt";
 
 export default function Zones(){
-    const { currentZone, changeZone } = useZone()
+    const { currentZone } = useZone()
     const { status, inscreverZona } = useMqtt()
     const [selected, setSelected] = useState(currentZone || "zona_A");
     const [confirming, setConfirming] = useState(false);
@@ -18,10 +18,8 @@ export default function Zones(){
     const handleConfirm = () => {
         if (status !== 'conectado') return
         
-
         setConfirming(true);
         inscreverZona(selected)
-        changeZone(selected)
         setTimeout(() => navigate("/"), 700);
     };
 
