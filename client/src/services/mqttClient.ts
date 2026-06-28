@@ -1,10 +1,10 @@
 import mqtt, {  type MqttClient } from 'mqtt'
 
-let client: MqttClient | null = null
+const BROKER_URL = import.meta.env.VITE_MQTT_URL || "ws://localhost:9001"
 
-export function getMqttClient(): MqttClient {
-  if (!client) {
-    client = mqtt.connect('ws://localhost:9001')
-  }
-  return client
-}
+const client: MqttClient = mqtt.connect(BROKER_URL, {
+  connectTimeout: 5000,
+  reconnectPeriod: 2000,
+})
+
+export default client;
