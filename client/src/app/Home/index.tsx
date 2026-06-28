@@ -8,14 +8,16 @@ import { STATUS_BY_SEV } from '../../utils/subdescription'
 import HomeAlertCard from '../../components/ui/HomeAlertCard'
 import { useZone } from '../../contexts/zoneContext'
 import { useMqtt } from '../../hooks/useMqtt'
+import { useAlert } from '../../contexts/alertContext'
 
 export default function Home() {
   const { currentZone } = useZone()
   const { status: mqttStatus } = useMqtt()
+  const { latestAlert } = useAlert()                         
   const zone = ZONES.find((z) => z.id === currentZone) ?? ZONES[0]
   const zoneAlerts = MOCK_ALERTS.filter((a) => a.zone === currentZone)
-  const latest = zoneAlerts[0]
-  const status = latest ? latest.severity : "OK"
+  const latest = latestAlert ?? zoneAlerts[0]                 
+  const status = latest ? latest.severity : "OK"             
   const cfg = STATUS_BY_SEV[status];
 
   return (
