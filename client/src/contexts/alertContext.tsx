@@ -1,6 +1,7 @@
 import { createContext, useState, useCallback, useContext, useEffect, type ReactNode } from "react";
-import mqtt from "mqtt";
+// import mqtt from "mqtt";
 import type { Alert } from "../types/Alert";
+import client from "../services/mqttClient";
 
 interface AlertContextType {
   latestAlert: Alert | null;
@@ -19,15 +20,17 @@ export const AlertProvider = ({ children, zone }: { children: ReactNode; zone: s
   useEffect(() => {
     if (!zone) return;
 
-    const brokerUrl = import.meta.env.VITE_MQTT_URL ?? "ws://localhost:9001";
+    // const brokerUrl = import.meta.env.VITE_MQTT_URL ?? "ws://localhost:9001";
     const topic = `defesacivil/alertas/${zone}/#`;
-    const client = mqtt.connect(brokerUrl);
 
-    client.on("connect", () => client.subscribe(topic));
+    client.on("connect", () => client.subscribe(topic, { qos: 1 }, (err) => {
+      if (!err) console.log(`🟩 Inscrito com sucesso na zona: ${zone}`);
+    }));
+
     client.on("message", (_topic, payload) => {
       const raw = payload.toString();
       try {
-        const parsed = JSON.parse(raw) as any;
+        const parsed = JSON.parse(raw);
         const alert: Alert = {
           id: parsed.id ?? crypto.randomUUID(),
           title: parsed.title ?? parsed.categoria ?? "Novo alerta",
@@ -44,7 +47,9 @@ export const AlertProvider = ({ children, zone }: { children: ReactNode; zone: s
       }
     });
 
-    return () => { client.end(); };
+    return () => { 
+      client.removeAllListeners();
+    };
   }, [zone]);
 
   return (
@@ -54,6 +59,7 @@ export const AlertProvider = ({ children, zone }: { children: ReactNode; zone: s
   );
 };
 
+//eslint-disable-next-line
 export const useAlert = (): AlertContextType => {
   const ctx = useContext(AlertContext);
   if (!ctx) throw new Error("useAlert deve ser usado dentro de AlertProvider");
