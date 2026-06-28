@@ -1,5 +1,6 @@
 import { AlertController } from "@controllers";
 import { Router } from "express";
+import { verifySecret } from "@middlewares";
 
 const AlertRouter = Router();
 
