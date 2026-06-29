@@ -1,17 +1,35 @@
-import { createContext, useState, useCallback, useContext, type ReactNode } from "react";
+import { createContext, useState, useCallback, useContext, type ReactNode, useEffect } from "react";
+import { getAllZones } from "../requests/getZones";
+
+interface Zone{
+    id: number,
+    name: string,
+    label: string
+}
 
 interface ZoneContextType {
   currentZone: string | null;
   changeZone: (newZone: string) => void;
   initializeZone: (userZone: string) => void;
   resetZone: () => void;
+  zones: Zone[];
 }
 
 const ZoneContext = createContext<ZoneContextType | undefined>(undefined);
 
 export const ZoneProvider = ({children} : {children: ReactNode}) => {
+    const [zones, setZones] = useState<Zone[]>([]);
     const [currentZone, setCurrentZone] = useState<string | null>("zona_A");
     const [hasChanged, setHasChanged] = useState(false);
+
+    useEffect(() => {
+        const getZns = async() => {
+            const response = await getAllZones();
+            setZones(response);
+        }
+
+        getZns();
+    }, [])
 
     const initializeZone = useCallback((userZone: string) => {
         if(!hasChanged && userZone){
@@ -32,7 +50,7 @@ export const ZoneProvider = ({children} : {children: ReactNode}) => {
     }
 
     return (
-        <ZoneContext.Provider value={{currentZone, changeZone, initializeZone, resetZone}}>
+        <ZoneContext.Provider value={{currentZone, changeZone, initializeZone, resetZone, zones}}>
             {children}
         </ZoneContext.Provider>
     )
