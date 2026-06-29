@@ -16,7 +16,7 @@ export default function AlertPopup() {
       osc.frequency.setValueAtTime(880, audioRef.current.currentTime);
       osc.start();
       osc.stop(audioRef.current.currentTime + 0.4);
-    } catch {}
+    } catch { return }
 
     // Vibração (mobile)
     if (navigator.vibrate) navigator.vibrate([300, 100, 300]);
@@ -32,14 +32,14 @@ export default function AlertPopup() {
     INFO: "bg-blue-500",
     OK: "bg-green-500",
   };
-  const bg = bgByseverity[popupAlert.severity] ?? "bg-gray-700";
+  const bg = bgByseverity[popupAlert.gravidade] ?? "bg-gray-700";
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
       <div className={`${bg} text-white rounded-xl p-6 mx-4 max-w-sm w-full shadow-xl`}>
         <p className="text-xs font-bold uppercase tracking-widest mb-1">⚠ Alerta recebido</p>
-        <h2 className="text-lg font-bold mb-2">{popupAlert.title}</h2>
-        <p className="text-sm mb-4">{popupAlert.description}</p>
+        <h2 className="text-lg font-bold mb-2">{popupAlert.categoria}</h2>
+        <p className="text-sm mb-4">{popupAlert.descricao}</p>
         <button
           onClick={dismissPopup}
           className="w-full py-2 bg-white text-black font-semibold rounded-lg"
