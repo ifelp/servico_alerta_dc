@@ -281,10 +281,10 @@ npm install
 Inicie o servidor de desenvolvimento:
 
 ```
-npm run dev
+npm run build && npm run preview
 ```
 
-O Vite iniciará um servidor local, geralmente em `http://localhost:5173`. Abra esse endereço no navegador.
+O Vite iniciará um servidor local, geralmente em `http://localhost:5173` ou `http://localhost:4173` para builds. Abra esse endereço no navegador.
 
 **Fluxo de uso na interface web:**
 
@@ -352,7 +352,7 @@ SENHA_DO_PROJETO_MANHATTAN=sua_chave_secreta_aqui   # mesma configurada na API
 Inicie o painel:
 
 ```
-npm run operator
+npm run dev
 ```
 
 **Fluxo de uso na TUI:**
@@ -371,10 +371,10 @@ npm run operator
    - Pressione `Enter` no botão **Enviar**. O painel de Logs confirmará `[OK] Alerta validado e publicado com sucesso!` ou exibirá o erro retornado pela API.
 4. **Encerrar:** pressione `q`, `Escape` ou `Ctrl+C` para sair.
 
-> **Atenção:** o painel TUI principal (`npm run operator`) requer um terminal com suporte a cores e controle de cursor (qualquer emulador moderno: iTerm2, Windows Terminal, GNOME Terminal, etc.). Se o ambiente não suportar a TUI completa, use a versão simplificada:
+> **Atenção:** o painel TUI principal (`npm run devr`) requer um terminal com suporte a cores e controle de cursor (qualquer emulador moderno: iTerm2, Windows Terminal, GNOME Terminal, etc.). Se o ambiente não suportar a TUI completa, use a versão simplificada:
 >
 > ```
-> npm run dev   # CLI readline, sem interface gráfica
+> npm run operator   # CLI readline, sem interface gráfica
 > ```
 
 ---
@@ -384,15 +384,15 @@ npm run operator
 O roteiro abaixo demonstra o fluxo completo de Push usando as duas interfaces simultaneamente:
 
 ```
-Terminal 1 (raiz)         → docker compose up --build           (API + Broker)
-Terminal 2 (navegador)    → cd client && npm run dev             (Interface web do cidadão — selecionar zona_a)
-Terminal 3 (operator)     → cd operator && npm run operator      (Painel TUI do operador)
+Terminal 1 (raiz)         → docker compose up --build               (API + Broker)
+Terminal 2 (navegador)    → cd client && npm run build && npm run start             (Interface web do cidadão — selecionar zona_a)
+Terminal 3 (operator)     → cd operator && npm run dev          (Painel TUI do operador)
 ```
 
 **Passo a passo:**
 
 1. **Terminal 1** — Suba a infraestrutura e aguarde as mensagens `Serviço de broker conectado com sucesso` e `App escutando na porta 3001`.
-2. **Terminal 2 / Navegador** — Abra `http://localhost:5173`, vá em **Zonas** e selecione `zona_a`. O status de conexão deve mostrar **Conectado**.
+2. **Terminal 2 / Navegador** — Abra `http://localhost:5173` ou `http://localhost:4173`, vá em **Zonas** e selecione `zona_a`. O status de conexão deve mostrar **Conectado**.
 3. **Terminal 3** — Inicie o painel do operador, faça login com um ID autorizado e, no dashboard, selecione `zona_a`, informe a categoria `deslizamento`, gravidade `ALTO` e uma descrição. Pressione **Enviar**.
 4. **Resultado esperado:**
    - O **Log** no Terminal 3 exibe `[OK] [201] Alerta validado e publicado com sucesso!`
