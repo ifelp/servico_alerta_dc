@@ -4,7 +4,7 @@ import type { Dispatch, SetStateAction } from "react"
 import type { MqttStatus } from "../hooks/useMqtt"
 
 interface SelectZoneSectionProps{
-    zones: {id: string, label: string}[],
+    zones: {id: number, name: string , label: string}[],
     selectedZone: string,
     setSelectedZone: Dispatch<SetStateAction<string>>,
     confirming: boolean,
@@ -23,12 +23,12 @@ export default function SelectZoneSection({ zones, selectedZone, setSelectedZone
 
     return(
         <SelectZoneSectionWrapper>
-            {zones.map((z, idx) => (
+            {zones.map((z) => (
                 <SelectZoneButton 
-                    key={idx} 
-                    estado={getEstado(z.id)}
+                    key={z.id} 
+                    estado={getEstado(z.name)}
                     setSelected={setSelectedZone} 
-                    zoneId={z.id} 
+                    zoneId={z.name} 
                     zoneLabel={z.label} 
                 />
             ))}

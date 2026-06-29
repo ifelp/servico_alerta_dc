@@ -3,22 +3,22 @@ import HistoryHeader from "../../components/historyHeader"
 import AlertsHistory from "../../components/alertsHistory"
 import AlertsCard from "../../components/ui/alertCard"
 import EmptyAlertsHistory from "../../components/ui/emptyAlertsHistory"
-import { ZONES, MOCK_ALERTS } from "../../utils/mocks"
 import { useZone } from "../../contexts/zoneContext"
+import { useAlert } from "../../contexts/alertContext"
 
 export default function History(){
-    const { currentZone } = useZone();
-    const zone = ZONES.find((z) => z.id === currentZone) ?? ZONES[0]
-    const alerts = MOCK_ALERTS.filter((a) => a.zone === currentZone).sort(
-        (a,b) => +new Date(b.issuedAt) - +new Date(a.issuedAt)
-    );
+    const { currentZone, zones } = useZone(); 
+    const { alerts } = useAlert();
+    const zone = zones.find((z) => z.name === currentZone) || zones[0];
+
+    if(!zone) return
 
     return (
         <PageWrapper showHeader={true}>
-            <HistoryHeader alertsLeng={alerts.length} zoneLabel={zone.label} />
+            <HistoryHeader alertsLeng={alerts.length} zoneLabel={zone.label || ""} />
             <AlertsHistory>
                 {alerts.map((a) => (
-                    <AlertsCard key={a.id} title={a.title} description={a.description} issuedAt={a.issuedAt} severity={a.severity} />
+                    <AlertsCard key={a.id} title={a.categoria} description={a.descricao} issuedAt={a.timestamp} severity={a.gravidade} />
                 ))}
                 {alerts.length === 0 && (
                     <EmptyAlertsHistory/>
