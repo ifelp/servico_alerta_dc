@@ -1,6 +1,7 @@
 import { Router } from "express";
 import UserRouter from "./userRoutes";
 import AlertRouter from "./alertRoutes";
+import ZoneRouter from "./zoneRoutes";
 
 const router: Router = Router();
 
@@ -23,5 +24,6 @@ router.post('/op-login', (req, res) => {
 //Rotas para User
 router.use('/user', UserRouter);
 router.use('/alert', AlertRouter);
+router.use('/zone', ZoneRouter);
 
 export default router;
