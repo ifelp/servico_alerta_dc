@@ -1,24 +1,31 @@
 import { createContext, useState, useCallback, useContext, useEffect, type ReactNode } from "react";
-// import mqtt from "mqtt";
-import type { Alert } from "../types/Alert";
+import type { AlertEntity } from "../types/Alert";
 import client from "../services/mqttClient";
+import { getAlerts } from "../requests/getAlerts";
 
 interface AlertContextType {
-  latestAlert: Alert | null;
-  popupAlert: Alert | null;
+  latestAlert: AlertEntity | null;
+  popupAlert: AlertEntity | null;
   dismissPopup: () => void;
+  alerts: AlertEntity[];
 }
 
 const AlertContext = createContext<AlertContextType | undefined>(undefined);
 
 export const AlertProvider = ({ children, zone }: { children: ReactNode; zone: string | null }) => {
-  const [latestAlert, setLatestAlert] = useState<Alert | null>(null);
-  const [popupAlert, setPopupAlert] = useState<Alert | null>(null);
+  const [latestAlert, setLatestAlert] = useState<AlertEntity | null>(null);
+  const [popupAlert, setPopupAlert] = useState<AlertEntity | null>(null);
+  const [alerts, setAlerts] = useState<AlertEntity[]>([]);
 
   const dismissPopup = useCallback(() => setPopupAlert(null), []);
 
   useEffect(() => {
     if (!zone) return;
+
+    const fetchAlerts = async() => {
+      const response = await getAlerts(zone);
+      setAlerts(response);
+    }
 
     // const brokerUrl = import.meta.env.VITE_MQTT_URL ?? "ws://localhost:9001";
     const topic = `defesacivil/alertas/${zone}/#`;
@@ -27,18 +34,21 @@ export const AlertProvider = ({ children, zone }: { children: ReactNode; zone: s
       if (!err) console.log(`🟩 Inscrito com sucesso na zona: ${zone}`);
     }));
 
+
+
     client.on("message", (_topic, payload) => {
       const raw = payload.toString();
       try {
         const parsed = JSON.parse(raw);
-        const alert: Alert = {
-          id: parsed.id ?? crypto.randomUUID(),
-          title: parsed.title ?? parsed.categoria ?? "Novo alerta",
-          description: parsed.description ?? parsed.descricao ?? "",
-          zone: parsed.zone ?? parsed.zona ?? zone,
-          severity: parsed.severity ?? parsed.gravidade ?? "INFO",
-          type: parsed.type ?? "info",
-          issuedAt: parsed.issuedAt ?? parsed.timestamp ?? new Date().toISOString(),
+        const alert: AlertEntity = {
+          id: parsed.id,
+          payload_id: parsed.payload_id ?? crypto.randomUUID(),
+          categoria: parsed.title ?? parsed.categoria ?? "Novo alerta",
+          descricao: parsed.description ?? parsed.descricao ?? "",
+          zona: parsed.zone ?? parsed.zona ?? zone,
+          gravidade: parsed.severity ?? parsed.gravidade ?? "INFO",
+          created_at: parsed.created_at,
+          timestamp: parsed.issuedAt ?? parsed.timestamp ?? new Date().toISOString(),
         };
         setLatestAlert(alert);
         setPopupAlert(alert);
@@ -47,13 +57,15 @@ export const AlertProvider = ({ children, zone }: { children: ReactNode; zone: s
       }
     });
 
+    fetchAlerts();
+
     return () => { 
       client.removeAllListeners();
     };
   }, [zone]);
 
   return (
-    <AlertContext.Provider value={{ latestAlert, popupAlert, dismissPopup }}>
+    <AlertContext.Provider value={{ latestAlert, popupAlert, dismissPopup, alerts }}>
       {children}
     </AlertContext.Provider>
   );
