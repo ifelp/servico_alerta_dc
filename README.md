@@ -1,10 +1,9 @@
 # 🚨 Sistema de Alertas de Defesa Civil
 
 
-
 ## Descrição
 
-Sistema distribuído de distribuição de alertas emergenciais baseados em localização geográfica. A plataforma permite que operadores disparem alertas categorizados por zona e tipo de risco, os quais são entregues em tempo real via modelo **Push**  a todos os cidadãos inscritos naquela região.
+Sistema distribuído de distribuição de alertas emergenciais baseados em localização geográfica. A plataforma permite que operadores disparem alertas categorizados por zona e tipo de risco, os quais são entregues em tempo real via modelo **Push** a todos os cidadãos inscritos naquela região.
 
 O sistema é composto por quatro componentes principais:
 
@@ -15,7 +14,8 @@ O sistema é composto por quatro componentes principais:
 
 ---
 
-##  Tecnologias Escolhidas e Justificativas
+## Tecnologias Escolhidas e Justificativas
+
 <p float="left">
     &nbsp;&nbsp;
     <a href="https://www.typescriptlang.org/">
@@ -58,7 +58,7 @@ Utilizado para persistência local do histórico de alertas emitidos. Escolhido 
 Escolha fundamentada em critérios de resiliência crítica:
 
 - **Tolerância a falhas de infraestrutura:** em cenários de desastre, a TUI opera via SSH com consumo zero de banda gráfica, funcionando inclusive em conexões de satélite degradadas onde uma aplicação React seria inutilizável.
-- **Sem pontos únicos de falha intermediários:** não depende de servidor de frontend (Nginx/Cloudflare) comunica-se diretamente com a API, reduzindo a cadeia de componentes que podem falhar.
+- **Sem pontos únicos de falha intermediários:** não depende de servidor de frontend (Nginx/Cloudflare) — comunica-se diretamente com a API, reduzindo a cadeia de componentes que podem falhar.
 - **Imunidade a incompatibilidades de navegador:** funciona em qualquer terminal POSIX, com inicialização instantânea e consistência visual absoluta independente do hardware do operador.
 
 ---
@@ -89,7 +89,21 @@ servico_alerta_dc/
 │   ├── android/              # Projeto Android gerado pelo Capacitor
 │   ├── public/               # Arquivos estáticos públicos
 │   └── src/
-│       └── assets/           # Imagens, ícones e recursos estáticos da interface
+│       ├── app/              # Páginas da aplicação (Home, Zones, History)
+│       ├── components/       # Componentes reutilizáveis da UI
+│       ├── contexts/         # Contextos React (AlertContext, ZoneContext)
+│       ├── hooks/            # Hooks customizados (useMqtt)
+│       ├── requests/         # Cliente MQTT de linha de comando (receiveAlerts.ts)
+│       ├── services/         # Serviços de API e conexão MQTT
+│       └── assets/           # Imagens, ícones e recursos estáticos
+├── operator/                 # Painel do Operador (TUI com blessed + blessed-contrib)
+│   ├── cli/                  # Interface simplificada de linha de comando (readline)
+│   └── src/
+│       ├── components/       # Widgets da TUI (ZoneList, PushAlert, AlertHistory, Logs)
+│       ├── config/           # Configuração da conexão MQTT
+│       ├── pages/            # Páginas da TUI (loginPage, homePage)
+│       ├── reqs/             # Requisições HTTP à API (login, sendAlert, getAlerts)
+│       └── types/            # Tipos TypeScript da camada do operador
 ├── mosquitto/
 │   └── config/
 │       └── mosquitto.conf    # Configuração do broker Eclipse Mosquitto
@@ -174,7 +188,7 @@ O Painel do Operador **nunca publica diretamente no broker.** Toda mensagem pass
 
 ### Payload de Alerta (JSON)
 
-```json
+```
 {
   "id": "f81d4fae-7dec-11d0-a765-00a0c91e6bf6",
   "zona": "zona_a",
@@ -209,102 +223,189 @@ Qualquer violação retorna HTTP `400 Bad Request`, impedindo que dados malforma
 
 ### 1. Clonar o Repositório
 
-```bash
+```
 git clone https://github.com/ifelp/servico_alerta_dc.git
 cd servico_alerta_dc
 ```
 
-### 2. Subir a API e o Broker (raiz do projeto)
+### 2. Configurar as variáveis de ambiente da API
+
+Antes de subir os contêineres, crie o arquivo `.env` dentro da pasta `api/` com as seguintes variáveis:
+
+```
+# api/.env
+PORT=3001
+MQTT_URL=mqtt://mosquitto-eclipse:1883
+SECRET=sua_chave_secreta_aqui
+OP_LIST=["op1","op2"]          # IDs autorizados a fazer login no painel do operador
+SENHA_DO_PROJETO_MANHATTAN=sua_chave_secreta_aqui   # mesma que SECRET
+```
+
+> `OP_LIST` deve ser um array JSON serializado como string. Os IDs listados são os únicos aceitos na tela de login do painel TUI.
+
+### 3. Subir a API e o Broker (raiz do projeto)
 
 Na **raiz** do repositório, suba o broker MQTT (Mosquitto) e a API com Docker Compose:
 
-```bash
+```
 docker compose up --build
 ```
 
 Isso inicializa:
-- **Eclipse Mosquitto** (broker MQTT) nas portas `1883` e `9001`
+- **Eclipse Mosquitto** (broker MQTT) nas portas `1883` (TCP) e `9001` (WebSocket)
 - **API Gateway** (Express) na porta `3001`
 
 Mantenha este terminal aberto — é nele que aparecem os logs da API e do broker.
 
 > Verificação opcional: `curl http://localhost:3001/` deve responder `{"message":"Feito com <3 e :D no Cin!"}`.
 
-### 3. Conectar clientes (cidadãos) em zonas distintas
+---
 
-Em outro terminal, entre na pasta `client` e instale as dependências (apenas na primeira vez):
+## Rodando as duas interfaces de usuário
 
-```bash
+O sistema possui **duas interfaces** que operam em paralelo, cada uma voltada a um público diferente:
+
+---
+
+### Interface 1 — Aplicativo do Cidadão (React + Vite — Web)
+
+A interface web do cidadão conecta-se ao broker Mosquitto via **WebSocket** (porta `9001`) e exibe alertas em tempo real para a zona selecionada pelo usuário.
+
+Entre na pasta `client` e instale as dependências (apenas na primeira vez):
+
+```
 cd client
 npm install
 ```
 
-Em seguida, conecte um cliente a uma zona específica:
+Inicie o servidor de desenvolvimento:
 
-```bash
-npm run client -- <zona>
+```
+npm run build && npm run preview
 ```
 
-Exemplo:
+O Vite iniciará um servidor local, geralmente em `http://localhost:5173` ou `http://localhost:4173` para builds. Abra esse endereço no navegador.
 
-```bash
+**Fluxo de uso na interface web:**
+
+1. Ao abrir o app, o cidadão acessa a **tela inicial** (Home) com o status de conexão ao broker.
+2. Navegue até a aba **Zonas** e selecione uma zona geográfica (ex.: `zona_a`). O app assina automaticamente o tópico `defesacivil/alertas/zona_a/#` via MQTT sobre WebSocket.
+3. Alertas chegam **em tempo real** via Push: um popup aparece na tela assim que o operador dispara um alerta para a zona inscrita.
+4. A aba **Histórico** exibe todos os alertas recebidos durante a sessão.
+
+> Para simular múltiplos cidadãos em zonas distintas, basta abrir o app em abas ou janelas diferentes do navegador e selecionar zonas diferentes em cada uma.
+
+#### Alternativa: cliente de linha de comando (terminal)
+
+Se preferir testar a recepção de alertas sem a interface gráfica, o `client` também oferece um modo CLI que se conecta ao broker via TCP (porta `1883`):
+
+```
+# Na pasta client/ (com dependências já instaladas)
+npm run client -- <zona>
+
+# Exemplo: escutar alertas da zona_a
 npm run client -- zona_a
 ```
 
-O cliente se conecta ao broker e assina o tópico `defesacivil/alertas/<zona>/#`, ficando à espera de alertas para aquela zona.
+Abra quantos terminais quiser, cada um com uma zona diferente:
 
-**Podemos abrir quantos clientes quiser, em terminais diferentes, cada um observando uma zona distinta**, por exemplo:
-
-```bash
+```
 npm run client -- zona_a   # terminal A
 npm run client -- zona_b   # terminal B
 npm run client -- zona_c   # terminal C
 ```
 
-### 4. Disparar um alerta pelo Painel do Operador
+O cliente exibirá cada alerta recebido no formato:
 
-Em outro terminal, entre na pasta `operator` e instale as dependências (apenas na primeira vez):
+```
+----- ALERTA RECEBIDO -----
+Topico: defesacivil/alertas/zona_a/deslizamento
+Zona: zona_a
+Categoria: deslizamento
+Gravidade: ALTO
+Descricao: Risco iminente na encosta...
+Timestamp: 2026-06-14T20:30:00.000Z
+---------------------------
+```
 
-```bash
+---
+
+### Interface 2 — Painel do Operador (TUI com blessed)
+
+O painel do operador é uma **Terminal User Interface (TUI)** interativa construída com `blessed` e `blessed-contrib`. Permite ao operador da Defesa Civil autenticar-se, compor e disparar alertas com campos navegáveis via teclado, além de monitorar o histórico de alertas e os logs em tempo real — tudo sem sair do terminal.
+
+Entre na pasta `operator` e instale as dependências (apenas na primeira vez):
+
+```
 cd operator
 npm install
 ```
 
-Em seguida, inicie o painel do operador:
-
-```bash
-npm run operator
-```
-
-O terminal apresentará um formulário interativo solicitando:
-
-- 📍 **Zona** (ex: `zona_a`)
-- 🏷️ **Categoria** (ex: `chuva`, `deslizamento`, `alagamento`, `incendio`, `vendaval`, `rompimento_barragem`)
-- ⚠️ **Gravidade** (`BAIXO`, `MEDIO` ou `ALTO`)
-- 📝 **Descrição** do alerta
-
-Ao confirmar, o operador envia o alerta via `POST /alert` para a API, que valida o payload e publica no broker MQTT.
-
-### 5. Validar o recebimento das mensagens
-
-Após o envio pelo operador, o alerta deve aparecer **imediatamente** no terminal de cada cliente conectado à zona correspondente, exibindo zona, categoria, gravidade, descrição e timestamp. Clientes conectados a outras zonas não devem receber a mensagem — isso confirma o roteamento correto por zona via MQTT.
-
-**Resumo do fluxo de teste:**
+Crie o arquivo `.env` dentro de `operator/` com:
 
 ```
-Terminal 1 (raiz)      → docker compose up --build      (API + Broker)
-Terminal 2 (client)    → npm run client -- zona_a        (cidadão na zona_a)
-Terminal 3 (client)    → npm run client -- zona_b        (cidadão na zona_b)
-Terminal 4 (operator)  → npm run operator                (dispara alerta para zona_a)
+# operator/.env
+SERVER_URL=http://localhost:3001
+SENHA_DO_PROJETO_MANHATTAN=sua_chave_secreta_aqui   # mesma configurada na API
 ```
 
-O alerta disparado no Terminal 4 deve chegar apenas ao Terminal 2 (zona_a), confirmando o fluxo completo Operador → API → Mosquitto → Cliente.
+Inicie o painel:
+
+```
+npm run dev
+```
+
+**Fluxo de uso na TUI:**
+
+1. **Tela de Login:** o operador informa o seu **Operador ID** (um dos IDs cadastrados em `OP_LIST` no `.env` da API). Credenciais inválidas exibem mensagem de erro sem abrir o dashboard.
+2. **Dashboard principal:** após autenticação, o terminal exibe o layout completo com quatro painéis:
+   - **Zone List** — lista de zonas disponíveis; use as setas ↑↓ para navegar e `Enter` para selecionar.
+   - **Push Alert** — formulário de disparo com campos `Categoria`, `Gravidade` (botão toggle que alterna `BAIXO → MEDIO → ALTO` a cada `Enter`) e `Descrição`.
+   - **Alert History** — histórico dos últimos alertas emitidos, atualizado automaticamente.
+   - **Logs** — painel de logs com feedback em tempo real de cada requisição enviada à API.
+3. **Disparar um alerta:**
+   - Selecione a zona no painel **Zone List** e pressione `Enter`.
+   - Preencha a **Categoria** (ex.: `deslizamento`) e pressione `Enter`.
+   - Pressione `Enter` no botão **Gravidade** até atingir o nível desejado.
+   - Preencha a **Descrição** do alerta.
+   - Pressione `Enter` no botão **Enviar**. O painel de Logs confirmará `[OK] Alerta validado e publicado com sucesso!` ou exibirá o erro retornado pela API.
+4. **Encerrar:** pressione `q`, `Escape` ou `Ctrl+C` para sair.
+
+> **Atenção:** o painel TUI principal (`npm run devr`) requer um terminal com suporte a cores e controle de cursor (qualquer emulador moderno: iTerm2, Windows Terminal, GNOME Terminal, etc.). Se o ambiente não suportar a TUI completa, use a versão simplificada:
+>
+> ```
+> npm run operator   # CLI readline, sem interface gráfica
+> ```
 
 ---
 
-## 👥 Equipe 04
+## Demonstrando o modelo Push end-to-end
 
-| Nome | 
+O roteiro abaixo demonstra o fluxo completo de Push usando as duas interfaces simultaneamente:
+
+```
+Terminal 1 (raiz)         → docker compose up --build               (API + Broker)
+Terminal 2 (navegador)    → cd client && npm run build && npm run start             (Interface web do cidadão — selecionar zona_a)
+Terminal 3 (operator)     → cd operator && npm run dev          (Painel TUI do operador)
+```
+
+**Passo a passo:**
+
+1. **Terminal 1** — Suba a infraestrutura e aguarde as mensagens `Serviço de broker conectado com sucesso` e `App escutando na porta 3001`.
+2. **Terminal 2 / Navegador** — Abra `http://localhost:5173` ou `http://localhost:4173`, vá em **Zonas** e selecione `zona_a`. O status de conexão deve mostrar **Conectado**.
+3. **Terminal 3** — Inicie o painel do operador, faça login com um ID autorizado e, no dashboard, selecione `zona_a`, informe a categoria `deslizamento`, gravidade `ALTO` e uma descrição. Pressione **Enviar**.
+4. **Resultado esperado:**
+   - O **Log** no Terminal 3 exibe `[OK] [201] Alerta validado e publicado com sucesso!`
+   - Na interface web (Terminal 2), o **popup de alerta** surge instantaneamente na tela do cidadão, exibindo zona, categoria, gravidade e descrição.
+   - Cidadãos inscritos em outras zonas **não recebem** a mensagem — o Mosquitto roteia apenas para os subscribers do tópico correto.
+
+Esse comportamento confirma o **modelo Push** implementado: o broker empurra o payload diretamente aos clientes conectados, sem qualquer polling ou refresh manual.
+
+---
+
+## Equipe 04
+
+| Nome |
 |---|
 | Gabriel Fonseca |
 | Guilherme Barbosa |
