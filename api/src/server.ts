@@ -5,7 +5,7 @@ import { runMigrations, connectBroker } from "@config";
 import { loggingHandler } from "@middlewares";
 
 const app = Express();
-const port = process.env.PORT || 3001;
+const port = Number(process.env.PORT) || 3001;
 
 async function runmig(){
     await runMigrations();
@@ -15,13 +15,13 @@ connectBroker();
 
 app.use(Express.json());
 app.use(cors({
-    origin: ["*"] //enquanto ainda não temos os serviços bem definidos.
+    origin: '*'//enquanto ainda não temos os serviços bem definidos.
 }))
 
 app.use(loggingHandler)
 
 app.use(router);
 
-app.listen(port, ()=>{
+app.listen(port, '0.0.0.0', ()=>{
     console.log(`App escutando na porta ${port}`);
 })
