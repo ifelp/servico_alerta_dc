@@ -43,7 +43,7 @@ export default function SelectZoneButton({setSelected, estado, zoneId, zoneLabel
                 </div>
 
                 <div className="flex-1 min-w-0">
-                    <p className="font-display font-semibold text-sm">{zoneLabel}</p>
+                    <p className="font-display font-semibold text-sm">{zoneId.replace('z', 'Z').replace('_', ' ')} - {zoneLabel}</p>
                     <p className="text-[11px] text-muted-foreground font-display uppercase tracking-wider mt-0.5">
                         {estado === 'selecionando' && 'inscrevendo...'}
                         {estado === 'indisponivel' && 'sem conexão'}
