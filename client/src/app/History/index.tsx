@@ -5,13 +5,16 @@ import AlertsCard from "../../components/ui/alertCard"
 import EmptyAlertsHistory from "../../components/ui/emptyAlertsHistory"
 import { useZone } from "../../contexts/zoneContext"
 import { useAlert } from "../../contexts/alertContext"
+import { Navigate } from "react-router-dom"
 
 export default function History(){
     const { currentZone, zones } = useZone(); 
+    const zone = zones.find((z) => z.name === currentZone) || {label: ""};
     const { alerts } = useAlert();
-    const zone = zones.find((z) => z.name === currentZone) || zones[0];
 
-    if(!zone) return
+    if(!currentZone) {
+        return <Navigate to={"/zona"} replace/>
+    }
 
     return (
         <PageWrapper showHeader={true}>

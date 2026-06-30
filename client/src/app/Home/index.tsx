@@ -8,16 +8,19 @@ import HomeAlertCard from '../../components/ui/HomeAlertCard'
 import { useZone } from '../../contexts/zoneContext'
 import { useMqtt } from '../../hooks/useMqtt'
 import { useAlert } from '../../contexts/alertContext'
+import { Navigate } from 'react-router-dom'
 
 export default function Home() {
   const { currentZone, zones } = useZone()
   const { status: mqttStatus } = useMqtt()
   const { latestAlert, alerts } = useAlert()                         
-  const zone = zones.find((z) => z.name === currentZone) ?? zones[0]
+  const zone = zones.find((z) => z.name === currentZone) || {label: ""};
   const zoneAlerts = alerts.filter((a) => a.zona === currentZone)
   const latest = latestAlert ?? zoneAlerts[0]   
   
-  if(!zone) return;
+  if(!currentZone) {
+    return <Navigate to={"/zona"} replace/>
+  };
 
   const status = latest ? latest.gravidade : "OK"             
   const cfg = STATUS_BY_SEV[status];
