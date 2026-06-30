@@ -15,7 +15,7 @@ export default function AlertPopup() {
       osc.connect(audioRef.current.destination);
       osc.frequency.setValueAtTime(880, audioRef.current.currentTime);
       osc.start();
-      osc.stop(audioRef.current.currentTime + 0.4);
+      osc.stop(audioRef.current.currentTime + 2.4);
     } catch { return }
 
     // Vibração (mobile)

@@ -42,16 +42,17 @@ export const AlertProvider = ({ children, zone }: { children: ReactNode; zone: s
         const parsed = JSON.parse(raw);
         const alert: AlertEntity = {
           id: parsed.id,
-          payload_id: parsed.payload_id ?? crypto.randomUUID(),
+          payload_id: parsed.id,
           categoria: parsed.title ?? parsed.categoria ?? "Novo alerta",
           descricao: parsed.description ?? parsed.descricao ?? "",
           zona: parsed.zone ?? parsed.zona ?? zone,
           gravidade: parsed.severity ?? parsed.gravidade ?? "INFO",
-          created_at: parsed.created_at,
+          created_at: parsed.created_at || parsed.timestamp,
           timestamp: parsed.issuedAt ?? parsed.timestamp ?? new Date().toISOString(),
         };
         setLatestAlert(alert);
         setPopupAlert(alert);
+        setAlerts(prev => [alert, ...prev])
       } catch {
         console.error("Payload inválido:", raw);
       }
@@ -61,6 +62,7 @@ export const AlertProvider = ({ children, zone }: { children: ReactNode; zone: s
 
     return () => { 
       client.removeAllListeners();
+      setLatestAlert(null)
     };
   }, [zone]);
 

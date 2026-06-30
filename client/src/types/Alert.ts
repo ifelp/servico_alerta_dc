@@ -11,7 +11,7 @@ export interface Alert{ //ainda não é a versão final do tipo Alert aqui.
 }
 
 export interface AlertEntity {
-  id: number;
+  id: string;
   payload_id: string;
   zona: string;
   categoria: string;

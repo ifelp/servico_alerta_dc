@@ -1,7 +1,7 @@
 import axios, { AxiosError, AxiosResponse } from "axios";
 import { AlertPayload } from "../types/Alert";
 
-const SERVER_URL = process.env.SERVER_URL || "http://localhost:3001/alert"
+const SERVER_URL = process.env.SERVER_URL || "http://localhost:3001"
 const KEY = process.env.SENHA_DO_PROJETO_MANHATTAN || '';
 
 export async function sendAlert(payload: AlertPayload, kidnapLog: (log: string) => void) {
@@ -9,7 +9,8 @@ export async function sendAlert(payload: AlertPayload, kidnapLog: (log: string) 
   kidnapLog("[INFO] Disparando POST para o servidor...");
   
   try {
-    const response = await axios.post(SERVER_URL, payload, {
+    
+    const response = await axios.post(`${SERVER_URL}/alert`, payload, {
         headers: {
             'mega-senha': KEY
         }
