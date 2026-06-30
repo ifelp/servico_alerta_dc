@@ -9,7 +9,8 @@ export async function sendAlert(payload: AlertPayload, kidnapLog: (log: string) 
   kidnapLog("[INFO] Disparando POST para o servidor...");
   
   try {
-    const response = await axios.post(SERVER_URL, payload, {
+    kidnapLog(`Url da env: ${process.env.SERVER_URL} e da const ${SERVER_URL}`);
+    const response = await axios.post(`${SERVER_URL}/alert`, payload, {
         headers: {
             'mega-senha': KEY
         }
