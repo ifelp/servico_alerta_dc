@@ -19,7 +19,7 @@ const ZoneContext = createContext<ZoneContextType | undefined>(undefined);
 
 export const ZoneProvider = ({children} : {children: ReactNode}) => {
     const [zones, setZones] = useState<Zone[]>([]);
-    const [currentZone, setCurrentZone] = useState<string | null>("zona_A");
+    const [currentZone, setCurrentZone] = useState<string | null>(localStorage.getItem('cZone') || null);
     const [hasChanged, setHasChanged] = useState(false);
 
     useEffect(() => {
@@ -41,6 +41,7 @@ export const ZoneProvider = ({children} : {children: ReactNode}) => {
         if(newZone !== currentZone){
             setCurrentZone(newZone)
             setHasChanged(true)
+            localStorage.setItem("cZone", newZone);
         }
     }
 
