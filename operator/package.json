@@ -9,7 +9,9 @@
   "scripts": {
     "dev": "npx tsx --env-file=.env src/index.ts",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "operator": "npx tsx cli/index.ts"
+    "operator": "npx tsx cli/index.ts",
+    "build": "npx tsup src/index.ts --format esm --clean",
+    "start": "node dist/index.js"
   },
   "dependencies": {
     "@clack/prompts": "^1.5.1",
@@ -24,6 +26,7 @@
   "devDependencies": {
     "@types/mqtt": "^0.0.34",
     "@types/node": "^25.9.3",
+    "tsup": "^8.5.1",
     "typescript": "^6.0.3"
   }
 }
